@@ -10,6 +10,8 @@ use bytecode::Code;
 use compile::{compile, CompileError};
 use encode::{DecodeError, read_bytecode_file, write_bytecode_file};
 use error::Error;
+#[cfg(not(any(unix,windows)))]
+use error::LogicError;
 use exec::{Context, execute};
 use function::{Arity, Function, FunctionImpl, Lambda, SystemFn};
 use io::{IoError, IoMode};
@@ -480,6 +482,7 @@ enum ModuleFileResult {
     UseSource,
 }
 
+#[cfg(any(unix,windows))]
 fn find_module_file(src_path: &Path, code_path: &Path) -> Result<ModuleFileResult, Error> {
     match (code_path.exists(), src_path.exists()) {
         (true, true) if is_younger(code_path, src_path)? =>
@@ -490,6 +493,11 @@ fn find_module_file(src_path: &Path, code_path: &Path) -> Result<ModuleFileResul
     }
 }
 
+#[cfg(not(any(unix,windows)))]
+fn find_module_file(_src_path: &Path, _code_path: &Path) -> Result<ModuleFileResult, Error> {
+    Err(Error::Custom(Box::new(LogicError::NotImplemented)))
+}
+
 fn find_source_file(src_path: &Path) -> ModuleFileResult {
     if src_path.exists() {
         ModuleFileResult::UseSource
@@ -498,6 +506,7 @@ fn find_source_file(src_path: &Path) -> ModuleFileResult {
     }
 }
 
+#[cfg(any(unix,windows))]
 fn is_younger(a: &Path, b: &Path) -> Result<bool, Error> {
     let ma = a.metadata()
         .map_err(|e| IoError::new(IoMode::Stat, a, e))?;

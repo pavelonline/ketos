@@ -68,6 +68,29 @@ error_type!{
     }
 }
 
+/// Static error kinds; Bugs in the code;
+#[derive(Debug)]
+pub enum LogicError {
+    /// Current functionality is not yet implemented
+    NotImplemented,
+}
+
+impl fmt::Display for LogicError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            LogicError::NotImplemented => write!(f, "{}", self.description()),
+        }
+    }
+}
+
+impl StdError for LogicError {
+    fn description(&self) -> &str {
+        match self {
+            LogicError::NotImplemented => "not implemented",
+        }
+    }
+}
+
 impl Error {
     /// Returns an `Error` value wrapping a custom error type.
     pub fn custom<E: 'static + StdError>(e: E) -> Error {

@@ -1,8 +1,3 @@
-extern crate dirs;
-#[macro_use] extern crate gumdrop;
-extern crate ketos;
-extern crate linefeed;
-
 use std::cell::RefCell;
 use std::env::{split_paths, var_os};
 use std::io::{self, stderr, Write};
@@ -21,11 +16,6 @@ use linefeed::{
     Interface, Prompter, Command, Completer,
     Completion, Function, ReadResult, Signal, Suffix, Terminal,
 };
-
-fn main() {
-    let status = run();
-    std::process::exit(status);
-}
 
 #[derive(Options)]
 struct KetosOpts {
@@ -51,7 +41,7 @@ struct KetosOpts {
     no_rc: bool,
 }
 
-fn run() -> i32 {
+pub fn run() -> i32 {
     let args = std::env::args().collect::<Vec<_>>();
 
     // Allow arguments that appear to be options to be passed to scripts
